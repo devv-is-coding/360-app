@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: .
+      target: app
+    image: 360-app
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    # Picks up APP_KEY and any other local settings; overridden by `environment` below.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SERVER_NAME: ":80"
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: mariadb
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-app360}
+      DB_USERNAME: ${DB_USERNAME:-app360}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+    ports:
+      - "${APP_PORT:-8000}:80"
+    volumes:
+      - app-storage:/app/storage
+
+  mariadb:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE:-app360}
+      MARIADB_USER: ${DB_USERNAME:-app360}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-secret}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+volumes:
+  app-storage:
+  mariadb-data:
