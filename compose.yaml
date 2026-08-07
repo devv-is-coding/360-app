@@ -1,3 +1,7 @@
+# .env is the single source of truth for app config and secrets, and is gitignored.
+# The app service reads it wholesale via env_file - nothing here re-declares an app
+# variable. The mariadb service can only take MARIADB_*-prefixed names, so those are
+# mapped from the same .env values; `:?` makes compose refuse to start if one is unset.
 services:
   app:
     build:
@@ -8,25 +12,11 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    # Picks up APP_KEY and any other local settings; overridden by `environment` below.
     env_file:
-      - path: .env
-        required: false
+      - .env
     environment:
+      # Not app config: tells FrankenPHP to serve plain HTTP on :80 inside the container.
       SERVER_NAME: ":80"
-      APP_ENV: ${APP_ENV:-local}
-      APP_DEBUG: ${APP_DEBUG:-true}
-      APP_URL: ${APP_URL:-http://localhost:8000}
-      DB_CONNECTION: mariadb
-      DB_HOST: mariadb
-      DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-app360}
-      DB_USERNAME: ${DB_USERNAME:-app360}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
-      SESSION_DRIVER: database
-      CACHE_STORE: database
-      QUEUE_CONNECTION: database
-      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
     ports:
       - "${APP_PORT:-8000}:80"
     volumes:
@@ -36,10 +26,10 @@ services:
     image: mariadb:11.4
     restart: unless-stopped
     environment:
-      MARIADB_DATABASE: ${DB_DATABASE:-app360}
-      MARIADB_USER: ${DB_USERNAME:-app360}
-      MARIADB_PASSWORD: ${DB_PASSWORD:-secret}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: "${DB_DATABASE:?missing in .env}"
+      MARIADB_USER: "${DB_USERNAME:?missing in .env}"
+      MARIADB_PASSWORD: "${DB_PASSWORD:?missing in .env}"
+      MARIADB_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:?missing in .env}"
     ports:
       - "${FORWARD_DB_PORT:-3306}:3306"
     volumes:
