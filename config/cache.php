@@ -41,7 +41,9 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_CACHE_CONNECTION'),
+            // Central by default; CacheTenancyBootstrapper scopes entries per tenant
+            // with tags rather than by using a separate table per tenant.
+            'connection' => env('DB_CACHE_CONNECTION', env('DB_CONNECTION')),
             'table' => env('DB_CACHE_TABLE', 'cache'),
             'lock_connection' => env('DB_CACHE_LOCK_CONNECTION'),
             'lock_table' => env('DB_CACHE_LOCK_TABLE'),

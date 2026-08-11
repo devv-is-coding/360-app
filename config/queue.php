@@ -37,7 +37,9 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_QUEUE_CONNECTION'),
+            // Central by default; QueueTenancyBootstrapper carries the tenant id in
+            // the job payload and re-initializes tenancy when the job runs.
+            'connection' => env('DB_QUEUE_CONNECTION', env('DB_CONNECTION')),
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
             'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),

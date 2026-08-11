@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\StartSession;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,7 +16,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Tenancy must be initialized before the session starts, otherwise the
+        // session would be resolved against the wrong database connection.
+        // Laravel 11+ replaced App\Http\Kernel, so priority is declared here
+        // rather than in TenancyServiceProvider.
+        $middleware->prependToPriorityList(
+            before: StartSession::class,
+            prepend: InitializeTenancyByDomain::class,
+        );
+
+        $middleware->prependToPriorityList(
+            before: InitializeTenancyByDomain::class,
+            prepend: PreventAccessFromCentralDomains::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

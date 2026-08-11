@@ -73,7 +73,9 @@ return [
     |
     */
 
-    'connection' => env('SESSION_CONNECTION'),
+    // Defaults to the central connection so sessions keep working on tenant
+    // domains, where tenancy swaps the default connection to the tenant database.
+    'connection' => env('SESSION_CONNECTION', env('DB_CONNECTION')),
 
     /*
     |--------------------------------------------------------------------------

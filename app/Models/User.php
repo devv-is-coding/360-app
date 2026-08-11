@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
  * @property int $id
@@ -54,22 +55,18 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, SoftDeletes, TwoFactorAuthenticatable;
-
     /**
-     * The name of the "created at" column.
+     * Users live in the central database, so this model must stay on the central
+     * connection even while tenancy has swapped the default connection to a tenant.
+     *
+     * @use HasFactory<UserFactory>
      */
+    use CentralConnection, HasFactory, Notifiable, PasskeyAuthenticatable, SoftDeletes, TwoFactorAuthenticatable;
+
     const CREATED_AT = 'created_on';
 
-    /**
-     * The name of the "updated at" column.
-     */
     const UPDATED_AT = 'updated_on';
 
-    /**
-     * The name of the "deleted at" column.
-     */
     const DELETED_AT = 'deleted_on';
 
     /**

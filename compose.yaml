@@ -47,6 +47,9 @@ services:
       - "${FORWARD_DB_PORT:-3306}:3306"
     volumes:
       - mariadb-data:/var/lib/mysql
+      # Grants the app user rights over tenant% databases. Only runs when the
+      # data directory is empty, i.e. on a fresh volume.
+      - ./docker/mariadb/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
