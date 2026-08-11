@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -27,7 +28,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property string $last_name
  * @property string|null $contact_number
  * @property string|null $profile_picture
- * @property int $role
+ * @property Role $role
  * @property bool $is_active
  * @property Carbon|null $email_verified_at
  * @property string $password
@@ -80,7 +81,7 @@ class User extends Authenticatable implements PasskeyUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'deleted_on' => 'datetime',
-            'role' => 'integer',
+            'role' => Role::class,
             'is_active' => 'boolean',
         ];
     }
@@ -95,6 +96,14 @@ class User extends Authenticatable implements PasskeyUser
         return Attribute::get(fn (): string => collect([$this->first_name, $this->middle_name, $this->last_name])
             ->filter()
             ->implode(' '));
+    }
+
+    /**
+     * Determine if the user has full platform access.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role->isSuperAdmin();
     }
 
     /**

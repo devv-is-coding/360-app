@@ -1,22 +1,65 @@
-<x-layouts::auth :title="__('Register')">
+<x-layouts::auth :title="__('Super admin sign up')">
     <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
+        <div class="flex flex-col gap-3">
+            <flux:badge size="sm" color="amber" icon="shield-check" class="self-center">
+                {{ __('Super admin') }}
+            </flux:badge>
+
+            <x-auth-header
+                :title="__('Create a super admin account')"
+                :description="__('This account has unrestricted access to every tenant and platform setting')"
+            />
+        </div>
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
         <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
             @csrf
-            <!-- Name -->
+
+            <!-- First Name -->
             <flux:input
-                name="name"
-                :label="__('Name')"
-                :value="old('name')"
+                name="first_name"
+                :label="__('First name')"
+                :value="old('first_name')"
                 type="text"
                 required
                 autofocus
-                autocomplete="name"
-                :placeholder="__('Full name')"
+                autocomplete="given-name"
+                :placeholder="__('First name')"
+            />
+
+            <!-- Middle Name -->
+            <flux:input
+                name="middle_name"
+                :label="__('Middle name')"
+                :value="old('middle_name')"
+                type="text"
+                autocomplete="additional-name"
+                :placeholder="__('Optional')"
+            />
+
+            <!-- Last Name -->
+            <flux:input
+                name="last_name"
+                :label="__('Last name')"
+                :value="old('last_name')"
+                type="text"
+                required
+                autocomplete="family-name"
+                :placeholder="__('Last name')"
+            />
+
+            <!-- Username -->
+            <flux:input
+                name="username"
+                :label="__('Username')"
+                :value="old('username')"
+                type="text"
+                required
+                autocomplete="username"
+                :description="__('Letters, numbers, dashes and underscores only.')"
+                placeholder="superadmin"
             />
 
             <!-- Email Address -->
@@ -27,7 +70,17 @@
                 type="email"
                 required
                 autocomplete="email"
-                placeholder="email@example.com"
+                placeholder="admin@example.com"
+            />
+
+            <!-- Contact Number -->
+            <flux:input
+                name="contact_number"
+                :label="__('Contact number')"
+                :value="old('contact_number')"
+                type="tel"
+                autocomplete="tel"
+                :placeholder="__('Optional')"
             />
 
             <!-- Password -->
@@ -54,9 +107,15 @@
                 viewable
             />
 
+            <flux:callout variant="warning" icon="exclamation-triangle" inline>
+                <flux:callout.text>
+                    {{ __('Anyone who can reach this page can create a super admin account. Restrict access to this domain before going live.') }}
+                </flux:callout.text>
+            </flux:callout>
+
             <div class="flex items-center justify-end">
                 <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
-                    {{ __('Create account') }}
+                    {{ __('Create super admin account') }}
                 </flux:button>
             </div>
         </form>
