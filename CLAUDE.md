@@ -166,3 +166,61 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+## Git Commit Message Convention
+
+Use Conventional Commits:
+
+`<type>(<scope>): <short description>`
+
+### Types
+
+- `feat:` — New feature or functionality
+- `fix:` — Bug fix
+- `refactor:` — Code restructuring without changing behavior
+- `style:` — Formatting, styling, or UI-only changes
+- `docs:` — Documentation changes
+- `test:` — Adding or modifying tests
+- `perf:` — Performance improvements
+- `build:` — Build system, dependencies, Docker, or build configuration
+- `ci:` — CI/CD changes
+- `chore:` — General maintenance
+- `revert:` — Reverting a previous commit
+
+### Examples
+
+- `feat(auth): add Google authentication`
+- `fix(booking): resolve payment status issue`
+- `refactor(api): simplify response handling`
+- `style(button): improve hover animation`
+- `docs(api): update API documentation`
+- `test(auth): add login endpoint tests`
+- `chore(deps): update dependencies`
+
+### Rules
+
+1. Use lowercase for the commit type, scope, and description.
+2. Keep commit messages concise and preferably under 72 characters.
+3. Use imperative wording such as `add`, `fix`, `update`, `remove`, or `refactor`.
+4. Choose the commit type based on the actual changes made.
+5. Do not use vague messages such as `update`, `changes`, `fixed stuff`, or `misc`.
+6. Use a scope when it makes the change clearer, but do not force a scope when it is unnecessary.
+7. Use `!` for breaking changes, for example `feat(api)!: change response format`.
+8. When creating commits, inspect the actual changes first and select the appropriate commit type.
+9. Do not create commits unless the user explicitly asks you to commit or the current task explicitly requires a commit.
+10. Follow the project's existing Git workflow and branching rules.
+
+## CLAUDE.md Modification Policy
+
+**Do not modify `CLAUDE.md` casually.**
+
+Only modify `CLAUDE.md` when:
+
+- The user explicitly asks you to modify or update it, or
+- A change is genuinely necessary to keep its instructions accurate and consistent with the project.
+
+Do not add new rules, notes, preferences, documentation, or instructions to `CLAUDE.md` simply because they may be useful for the current task.
+
+If a task can be completed without modifying `CLAUDE.md`, **do not modify it**.
+
+When a modification is necessary, make the **smallest possible change** and preserve all existing instructions, structure, priorities, and wording. Do not rewrite or reorganize unrelated sections.
