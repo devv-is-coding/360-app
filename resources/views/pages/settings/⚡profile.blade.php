@@ -12,16 +12,26 @@ use Livewire\Component;
 new #[Title('Profile settings')] class extends Component {
     use ProfileValidationRules;
 
-    public string $name = '';
+    public string $first_name = '';
+    public ?string $middle_name = null;
+    public string $last_name = '';
+    public string $username = '';
     public string $email = '';
+    public ?string $contact_number = null;
 
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+
+        $this->first_name = $user->first_name;
+        $this->middle_name = $user->middle_name;
+        $this->last_name = $user->last_name;
+        $this->username = $user->username;
+        $this->email = $user->email;
+        $this->contact_number = $user->contact_number;
     }
 
     /**
@@ -33,7 +43,11 @@ new #[Title('Profile settings')] class extends Component {
 
         $validated = $this->validate($this->profileRules($user->id));
 
-        $user->fill($validated);
+        $user->fill([
+            ...$validated,
+            'middle_name' => $validated['middle_name'] ?: null,
+            'contact_number' => $validated['contact_number'] ?: null,
+        ]);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -81,9 +95,22 @@ new #[Title('Profile settings')] class extends Component {
 
     <flux:heading class="sr-only">{{ __('Profile settings') }}</flux:heading>
 
-    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
+    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your profile information and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <flux:input wire:model="first_name" :label="__('First name')" type="text" required autofocus autocomplete="given-name" />
+
+            <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" autocomplete="additional-name" :placeholder="__('Optional')" />
+
+            <flux:input wire:model="last_name" :label="__('Last name')" type="text" required autocomplete="family-name" />
+
+            <flux:input
+                wire:model="username"
+                :label="__('Username')"
+                type="text"
+                required
+                autocomplete="username"
+                :description="__('Letters, numbers, dashes and underscores only.')"
+            />
 
             <div>
                 <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
@@ -106,6 +133,8 @@ new #[Title('Profile settings')] class extends Component {
                     </div>
                 @endif
             </div>
+
+            <flux:input wire:model="contact_number" :label="__('Contact number')" type="tel" autocomplete="tel" :placeholder="__('Optional')" />
 
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
