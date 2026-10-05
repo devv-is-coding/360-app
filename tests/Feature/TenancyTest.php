@@ -6,12 +6,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+use function Pest\Laravel\get;
+
 uses(RefreshDatabase::class);
 
 afterEach(function () {
+    // End tenancy first so the tenant connection is purged; Windows cannot delete
+    // an SQLite database file that is still open.
+    tenancy()->end();
+
     // Drops the tenant databases created during the test.
     Tenant::all()->each->delete();
-    tenancy()->end();
 });
 
 test('creating a tenant provisions and migrates a separate database', function () {
@@ -80,13 +85,13 @@ test('tenant routes are unreachable from a central domain', function () {
 
     $central = config('tenancy.central_domains')[0];
 
-    $this->get("http://{$central}/")->assertNotFound();
+    get("http://{$central}/")->assertNotFound();
 });
 
 test('tenant routes resolve the tenant from its domain', function () {
     Tenant::create(['id' => 'acme'])->domains()->create(['domain' => 'acme.localhost']);
 
-    $this->get('http://acme.localhost/')
+    get('http://acme.localhost/')
         ->assertOk()
         ->assertSee('acme');
 });

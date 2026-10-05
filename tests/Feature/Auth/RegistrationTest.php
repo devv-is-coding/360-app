@@ -4,18 +4,23 @@ use App\Enums\Role;
 use App\Models\User;
 use Laravel\Fortify\Features;
 
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertGuest;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+
 beforeEach(function () {
-    $this->skipUnlessFortifyHas(Features::registration());
+    skipUnlessFortifyHas(Features::registration());
 });
 
 test('registration screen can be rendered', function () {
-    $response = $this->get(route('register'));
+    $response = get(route('register'));
 
     $response->assertOk();
 });
 
 test('new users can register', function () {
-    $response = $this->post(route('register.store'), [
+    $response = post(route('register.store'), [
         'username' => 'superadmin',
         'email' => 'test@example.com',
         'first_name' => 'John',
@@ -29,7 +34,7 @@ test('new users can register', function () {
     $response->assertSessionHasNoErrors()
         ->assertRedirect(route('dashboard', absolute: false));
 
-    $this->assertAuthenticated();
+    assertAuthenticated();
 
     $user = User::firstWhere('email', 'test@example.com');
 
@@ -39,7 +44,7 @@ test('new users can register', function () {
 });
 
 test('registering creates a super admin', function () {
-    $this->post(route('register.store'), [
+    post(route('register.store'), [
         'username' => 'superadmin',
         'email' => 'test@example.com',
         'first_name' => 'John',
@@ -56,7 +61,7 @@ test('registering creates a super admin', function () {
 });
 
 test('optional profile fields may be omitted', function () {
-    $this->post(route('register.store'), [
+    post(route('register.store'), [
         'username' => 'superadmin',
         'email' => 'test@example.com',
         'first_name' => 'John',
@@ -75,7 +80,7 @@ test('optional profile fields may be omitted', function () {
 test('username must be unique', function () {
     User::factory()->create(['username' => 'superadmin']);
 
-    $this->post(route('register.store'), [
+    post(route('register.store'), [
         'username' => 'superadmin',
         'email' => 'test@example.com',
         'first_name' => 'John',
@@ -84,11 +89,11 @@ test('username must be unique', function () {
         'password_confirmation' => 'password',
     ])->assertSessionHasErrors('username');
 
-    $this->assertGuest();
+    assertGuest();
 });
 
 test('username rejects characters outside letters, numbers, dashes and underscores', function () {
-    $this->post(route('register.store'), [
+    post(route('register.store'), [
         'username' => 'super admin!',
         'email' => 'test@example.com',
         'first_name' => 'John',
@@ -97,5 +102,5 @@ test('username rejects characters outside letters, numbers, dashes and underscor
         'password_confirmation' => 'password',
     ])->assertSessionHasErrors('username');
 
-    $this->assertGuest();
+    assertGuest();
 });

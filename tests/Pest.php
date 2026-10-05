@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Fortify\Features;
 use Tests\TestCase;
 
 /*
@@ -44,7 +45,12 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Skip the current test unless the given Fortify feature is enabled.
+ */
+function skipUnlessFortifyHas(string $feature, ?string $message = null): void
 {
-    // ..
+    if (! Features::enabled($feature)) {
+        TestCase::markTestSkipped($message ?? "Fortify feature [{$feature}] is not enabled.");
+    }
 }

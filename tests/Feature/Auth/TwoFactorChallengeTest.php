@@ -3,12 +3,15 @@
 use App\Models\User;
 use Laravel\Fortify\Features;
 
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+
 beforeEach(function () {
-    $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
+    skipUnlessFortifyHas(Features::twoFactorAuthentication());
 });
 
 test('two factor challenge redirects to login when not authenticated', function () {
-    $response = $this->get(route('two-factor.login'));
+    $response = get(route('two-factor.login'));
 
     $response->assertRedirect(route('login'));
 });
@@ -21,7 +24,7 @@ test('two factor challenge can be rendered', function () {
 
     $user = User::factory()->withTwoFactor()->create();
 
-    $this->post(route('login.store'), [
+    post(route('login.store'), [
         'email' => $user->email,
         'password' => 'password',
     ])->assertRedirect(route('two-factor.login'));
