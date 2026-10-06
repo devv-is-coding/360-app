@@ -1,16 +1,27 @@
-<x-layouts::auth :title="__('Log in')">
+<x-layouts::auth
+    :title="__('Super admin log in')"
+    :panel-title="__('Super admin console')"
+    :panel-description="__('Provision tenants, manage their databases, and administer platform-wide settings from a single place.')"
+    :panel-notice="__('Restricted area. Activity is attributable to your account.')"
+>
     <div class="flex flex-col gap-6">
-        <x-auth-header
-            :title="__('Log in to your account')"
-            :description="__('Enter your email and password below to log in')"
-        />
+        <div class="flex flex-col gap-3">
+            <flux:badge size="sm" color="amber" icon="shield-check" class="self-center">
+                {{ __('Super admin') }}
+            </flux:badge>
+
+            <x-auth-header
+                :title="__('Log in to the console')"
+                :description="__('Enter your credentials to manage tenants and platform settings')"
+            />
+        </div>
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
         <x-passkey-verify />
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
+        <form method="POST" action="{{ route('admin.login.store') }}" class="flex flex-col gap-6">
             @csrf
 
             <!-- Email Address -->
@@ -22,7 +33,7 @@
                 required
                 autofocus
                 autocomplete="email"
-                placeholder="email@example.com"
+                placeholder="admin@example.com"
             />
 
             <!-- Password -->
@@ -49,16 +60,9 @@
 
             <div class="flex items-center justify-end">
                 <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
+                    {{ __('Log in to console') }}
                 </flux:button>
             </div>
         </form>
-
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
     </div>
 </x-layouts::auth>

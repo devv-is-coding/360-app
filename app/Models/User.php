@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -29,6 +30,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property string|null $contact_number
  * @property string|null $profile_picture
  * @property Role $role
+ * @property string|null $tenant_id
  * @property bool $is_active
  * @property Carbon|null $email_verified_at
  * @property string $password
@@ -40,6 +42,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property Carbon|null $updated_on
  * @property Carbon|null $deleted_on
  * @property-read string $full_name
+ * @property-read Tenant|null $tenant
  */
 #[Fillable([
     'username',
@@ -51,6 +54,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
     'contact_number',
     'profile_picture',
     'role',
+    'tenant_id',
     'is_active',
 ])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -96,6 +100,16 @@ class User extends Authenticatable implements PasskeyUser
         return Attribute::get(fn (): string => collect([$this->first_name, $this->middle_name, $this->last_name])
             ->filter()
             ->implode(' '));
+    }
+
+    /**
+     * Get the tenant an admin, manager or staff member belongs to.
+     *
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     /**

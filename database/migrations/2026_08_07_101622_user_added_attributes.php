@@ -26,8 +26,12 @@ return new class extends Migration
             $table->string('contact_number', 20)->nullable()->after('last_name');
             $table->string('profile_picture')->nullable()->after('contact_number');
             $table->unsignedTinyInteger('role')->default(0)->after('profile_picture');
-            $table->boolean('is_active')->default(true)->after('role');
+            // Admins, managers and staff belong to one tenant; super admins and customers do not.
+            $table->string('tenant_id')->nullable()->after('role');
+            $table->boolean('is_active')->default(true)->after('tenant_id');
             $table->softDeletes('deleted_on')->after('updated_on');
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->cascadeOnUpdate()->cascadeOnDelete();
         });
     }
 
@@ -37,6 +41,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['tenant_id']);
+
             $table->dropColumn([
                 'first_name',
                 'middle_name',
@@ -44,6 +50,7 @@ return new class extends Migration
                 'contact_number',
                 'profile_picture',
                 'role',
+                'tenant_id',
                 'is_active',
                 'deleted_on',
             ]);

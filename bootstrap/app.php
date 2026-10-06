@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\InitializeTenancyUnlessCentral;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -28,6 +29,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(
             before: InitializeTenancyByDomain::class,
             prepend: PreventAccessFromCentralDomains::class,
+        );
+
+        // Same reason as above, for the Fortify routes shared by both domains.
+        $middleware->prependToPriorityList(
+            before: StartSession::class,
+            prepend: InitializeTenancyUnlessCentral::class,
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {

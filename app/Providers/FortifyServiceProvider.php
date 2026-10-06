@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Enums\LoginPortal;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -38,6 +41,22 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
+
+        // Also consulted before the two-factor challenge, so a user can never reach
+        // 2FA through a portal they are not allowed to use. Failures return the
+        // generic "credentials do not match" error, so the role is not revealed.
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $user = User::where('email', $request->input(Fortify::username()))->first();
+
+            if ($user === null
+                || ! $user->is_active
+                || ! Hash::check((string) $request->input('password'), $user->password)
+                || ! LoginPortal::fromRequest($request)->allows($user)) {
+                return null;
+            }
+
+            return $user;
+        });
     }
 
     /**
@@ -45,7 +64,9 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn () => view('pages::auth.login'));
+        Fortify::loginView(fn () => tenancy()->initialized
+            ? view('pages::auth.tenant-login')
+            : view('pages::auth.login'));
         Fortify::verifyEmailView(fn () => view('pages::auth.verify-email'));
         Fortify::twoFactorChallengeView(fn () => view('pages::auth.two-factor-challenge'));
         Fortify::confirmPasswordView(fn () => view('pages::auth.confirm-password'));

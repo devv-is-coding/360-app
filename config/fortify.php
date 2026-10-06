@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\InitializeTenancyUnlessCentral;
 use Laravel\Fortify\Features;
 
 return [
@@ -101,7 +102,9 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    // Fortify's routes serve both the central and tenant domains; tenancy is
+    // initialized on tenant domains so login can be scoped to that tenant.
+    'middleware' => ['web', InitializeTenancyUnlessCentral::class],
 
     /*
     |--------------------------------------------------------------------------
@@ -161,7 +164,9 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Public sign-up is disabled: super admins will be invited by email, and
+        // tenant users are provisioned rather than self-registered.
+        // Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

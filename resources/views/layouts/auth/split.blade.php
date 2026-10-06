@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div class="relative grid h-dvh grid-cols-1 flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-e dark:border-neutral-800">
                 <div class="absolute inset-0 bg-neutral-900"></div>
                 <a href="{{ route('home') }}" class="relative z-20 flex items-center text-lg font-medium" wire:navigate>
@@ -16,17 +16,21 @@
 
                 <div class="relative z-20 mt-auto space-y-4">
                     <flux:heading size="lg" class="text-white">
-                        {{ __('Super admin console') }}
+                        {{ $panelTitle ?? (tenancy()->initialized ? tenant('name') ?? tenant('id') : config('app.name', 'Laravel')) }}
                     </flux:heading>
 
                     <p class="max-w-sm text-sm leading-relaxed text-neutral-300">
-                        {{ __('Provision tenants, manage their databases, and administer platform-wide settings from a single place.') }}
+                        {{ $panelDescription ?? (tenancy()->initialized
+                            ? __('Staff portal for administrators, managers and staff of this branch.')
+                            : __('Sign in to your customer account.')) }}
                     </p>
 
-                    <div class="flex items-center gap-2 pt-2 text-xs text-neutral-400">
-                        <flux:icon.shield-check variant="micro" />
-                        <span>{{ __('Restricted area. Activity is attributable to your account.') }}</span>
-                    </div>
+                    @if ($panelNotice ?? null)
+                        <div class="flex items-center gap-2 pt-2 text-xs text-neutral-400">
+                            <flux:icon.shield-check variant="micro" />
+                            <span>{{ $panelNotice }}</span>
+                        </div>
+                    @endif
                 </div>
             </div>
             <div class="w-full lg:p-8">
