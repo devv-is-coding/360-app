@@ -18,6 +18,7 @@
         "fluxui-development",
         "livewire-development",
         "tailwindcss-development",
-        "blaze-optimize"
+        "blaze-optimize",
+        "frontend-design"
     ]
 }
