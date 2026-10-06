@@ -209,6 +209,12 @@ Use Conventional Commits:
 9. Do not create commits unless the user explicitly asks you to commit or the current task explicitly requires a commit.
 10. Follow the project's existing Git workflow and branching rules.
 
+## Migrations
+
+- Do not create a new migration to add or change columns on an existing table. Edit the project's existing migration for that table instead (e.g. `users` columns go in `2026_08_07_101622_user_added_attributes.php`).
+- Never edit Laravel's default migrations (`0001_01_01_*`). Change their tables through the project's own migration instead.
+- Editing an existing migration requires a fresh migration (`migrate:fresh --seed`) to apply; tell the user.
+
 ## CLAUDE.md Modification Policy
 
 **Do not modify `CLAUDE.md` casually.**
