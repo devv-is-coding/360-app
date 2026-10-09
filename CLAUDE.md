@@ -8,6 +8,7 @@
 This application is a Laravel application running on PHP 8.4. Always use the APIs that match the installed major version of each package — do not assume a version.
 
 Before relying on a package's API, confirm its installed version:
+
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
 
@@ -78,7 +79,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
 - Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
-  - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
+    - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
@@ -214,6 +215,13 @@ Use Conventional Commits:
 - Do not create a new migration to add or change columns on an existing table. Edit the project's existing migration for that table instead (e.g. `users` columns go in `2026_08_07_101622_user_added_attributes.php`).
 - Never edit Laravel's default migrations (`0001_01_01_*`). Change their tables through the project's own migration instead.
 - Editing an existing migration requires a fresh migration (`migrate:fresh --seed`) to apply; tell the user.
+
+## Timestamp Columns
+
+- Use `_on`, not `_at`, for timestamp columns: `created_on`, `updated_on`, `deleted_on`.
+- This applies to Eloquent's timestamps and to domain timestamps (`approved_on`, `paid_on`, `requested_on`).
+- Models declare `CREATED_AT`, `UPDATED_AT` and `DELETED_AT` accordingly — see `app/Models/User.php` for the pattern.
+- Declare soft deletes as `$table->softDeletes('deleted_on')`.
 
 ## CLAUDE.md Modification Policy
 
