@@ -25,6 +25,20 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     /** @use HasFactory<TenantFactory> */
     use HasDatabase, HasDomains, HasFactory;
 
+    const CREATED_AT = 'created_on';
+
+    const UPDATED_AT = 'updated_on';
+
+    /**
+     * Real table columns; any other attribute is stored in the `data` JSON column.
+     *
+     * @return list<string>
+     */
+    public static function getCustomColumns(): array
+    {
+        return ['id', 'created_on', 'updated_on'];
+    }
+
     /**
      * Get the tenant's admins, managers and staff.
      *

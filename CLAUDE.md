@@ -223,6 +223,10 @@ Use Conventional Commits:
 - Models declare `CREATED_AT`, `UPDATED_AT` and `DELETED_AT` accordingly — see `app/Models/User.php` for the pattern.
 - Declare soft deletes as `$table->softDeletes('deleted_on')`.
 
+## Intelephense Diagnostics
+
+- Before ending a task, always check the Intelephense diagnostics (IDE `getDiagnostics`) for every file you created or modified, and resolve any errors or warnings you introduced.
+
 ## CLAUDE.md Modification Policy
 
 **Do not modify `CLAUDE.md` casually.**

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->renameColumn('name', 'username');
+            $table->renameColumn('email_verified_at', 'email_verified_on');
             $table->renameColumn('created_at', 'created_on');
             $table->renameColumn('updated_at', 'updated_on');
         });
@@ -60,6 +61,7 @@ return new class extends Migration
 
         Schema::table('users', function (Blueprint $table) {
             $table->renameColumn('username', 'name');
+            $table->renameColumn('email_verified_on', 'email_verified_at');
             $table->renameColumn('created_on', 'created_at');
             $table->renameColumn('updated_on', 'updated_at');
         });
